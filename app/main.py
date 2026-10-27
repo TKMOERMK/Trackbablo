@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from app.api.routes import router as expense_router
+from app.core.config import settings
 
 
 
-
-app = FastAPI(title="Trackbablo")
+app = FastAPI(title=settings.app_name)
 app.include_router(expense_router)
 
 @app.get("/")
