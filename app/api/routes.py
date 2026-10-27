@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database.db import get_db
 from app.repositories import expense_repo
 from app.schemas.expense import ExpenseCreate, ExpenseRead, ExpenseUpdate
+from datetime import date
 
 router = APIRouter(
     prefix="/expenses",
@@ -18,8 +19,14 @@ def create_expense( expense_data: ExpenseCreate, db: DbSession, ):
     return expense_repo.create_expense(db, expense_data)
 
 @router.get( "", response_model=list[ExpenseRead], )
-def get_expenses(db: DbSession):
-    return expense_repo.get_expenses(db)
+
+def get_expenses( db: DbSession, category: str | None = None, date_from: date | None = None, date_to: date | None = None, ):
+
+    if date_from is not None and date_to is not None:
+        if date_from > date_to:
+            raise HTTPException( status_code=status.HTTP_400_BAD_REQUEST, detail="Дата не может быть раньше, чем конечная дата", )
+
+    return expense_repo.get_expenses( db, category=category, date_from=date_from, date_to=date_to, )
 
 @router.get( "/{expense_id}", response_model=ExpenseRead, )
 
