@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    container_name: trackbablo-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/trackbablo.db
+    volumes:
+      - trackbablo-data:/data
+
+volumes:
+  trackbablo-data:
+  
