@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from app.database.db import get_db
 from app.repositories import expense_repo
-from app.schemas.expense import ExpenseCreate, ExpenseRead, ExpenseUpdate
 from datetime import date
+from app.schemas.expense import ( ExpenseCreate, ExpenseRead, ExpenseUpdate, ExpenseBulkRequest, ExpenseBulkResponse, )
 
 router = APIRouter(
     prefix="/expenses",
@@ -17,6 +17,12 @@ DbSession = Annotated[Session, Depends(get_db)]
 
 def create_expense( expense_data: ExpenseCreate, db: DbSession, ):
     return expense_repo.create_expense(db, expense_data)
+
+
+@router.post( "/bulk", response_model=ExpenseBulkResponse, status_code=status.HTTP_200_OK, )
+def create_expenses_bulk( bulk_data: ExpenseBulkRequest, db: DbSession, ):
+    return expense_repo.create_expenses_bulk( db, bulk_data.items, )
+
 
 @router.get( "", response_model=list[ExpenseRead], )
 

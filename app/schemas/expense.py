@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
+from uuid import UUID
 
 class ExpenseBase(BaseModel):
     title: str = Field(min_length=1, max_length=30)
@@ -25,3 +26,17 @@ class ExpenseUpdate(BaseModel):
     )
     category: str | None = Field(default=None, min_length=1, max_length=20)
     spent_on: date | None = None
+
+class ExpenseBulkItem(ExpenseBase):
+    source_id: UUID
+
+class ExpenseBulkRequest(BaseModel):
+    items: list[ExpenseBulkItem] = Field(
+        min_length=1,
+        max_length=500,
+    )
+
+class ExpenseBulkResponse(BaseModel):
+    received: int
+    inserted: int
+    skipped: int

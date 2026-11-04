@@ -3,6 +3,8 @@ from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseUpdate
 from sqlalchemy import select
 from datetime import date
+from sqlalchemy.dialects.postgresql import insert
+from app.schemas.expense import ExpenseBulkItem
 
 def create_expense(db: Session, expense_data: ExpenseCreate) -> Expense:
 
@@ -63,4 +65,27 @@ def delete_expense(db: Session, expense_id: int) -> bool:
 
     return True
 
+
+def create_expenses_bulk( db: Session, expenses: list[ExpenseBulkItem], ) -> dict[str, int]:
+    records = []
+    for expense in expenses:
+        record = expense.model_dump(exclude={"source_id"})
+        record["source_id"] = str(expense.source_id)
+        records.append(record)
+
+    statement = ( insert(Expense).values(records).on_conflict_do_nothing(index_elements=[Expense.source_id]).returning(Expense.id))
+
+    try:
+        inserted_ids = db.scalars(statement).all()
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    inserted = len(inserted_ids)
+    received = len(expenses)
+    return {
+        "received": received,
+        "inserted": inserted,
+        "skipped": received - inserted,
+    }
 

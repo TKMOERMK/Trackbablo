@@ -13,3 +13,11 @@ class Expense(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(7, 2))
     category: Mapped[str] = mapped_column(String(20))
     spent_on: Mapped[date] = mapped_column()
+
+    source_id: Mapped[str | None] = mapped_column(
+        String(36),
+        unique=True,
+        nullable=True,
+    )
+
+    
