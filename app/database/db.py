@@ -2,11 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.core.config import settings
 
-DATABASE_URL = "sqlite:///./trackbablo.db"
-
 engine = create_engine(
     settings.database_url,
-    connect_args={"check_same_thread": False},
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(
@@ -25,4 +23,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+
+
         

@@ -5,9 +5,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: sqlite:////data/trackbablo.db
-    volumes:
-      - trackbablo-data:/data
+       DATABASE_URL: "postgresql+psycopg://Elmir:${POSTGRES_PASSWORD}@postgres:5432/tracker"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:17
@@ -25,6 +26,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
 
 volumes:
   trackbablo-data:
